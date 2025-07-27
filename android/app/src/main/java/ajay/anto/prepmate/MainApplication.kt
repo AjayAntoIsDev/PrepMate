@@ -1,4 +1,4 @@
-package com.prepmate
+package ajay.anto.prepmate
 
 import android.app.Application
 import android.content.res.Configuration
