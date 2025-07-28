@@ -12,11 +12,26 @@ import { useState } from "react";
 import { Alert } from "react-native";
 import React from "react";
 import { Box } from "@/components/ui/box";
+import { getTodaysPlan } from "@/app/utils/ai/getTodaysPlan";
+
 enum Exam {
     JEE = "JEE",
     NEET = "NEET",
 }
-export default function Home() {
+async function getSubjects() {
+    console.log("Fetching today's plan for JEE exam...");
+    const jeeCompleted = {
+        Physics: [],
+        Chemistry: [],
+        Mathematics: [],
+    };
+
+    const jeePlan = await getTodaysPlan(45, jeeCompleted, "JEE");
+    console.log(jeePlan);  
+}
+
+export default function Home() {    
+    getSubjects();
     const [selectedExam, setSelectedExam] = useState<Exam | null>(null);
     React.useEffect(() => {
         const loadSelectedExam = async () => {

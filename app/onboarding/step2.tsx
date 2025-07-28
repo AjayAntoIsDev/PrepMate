@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Alert } from "react-native";
-import { Button, ButtonText,ButtonIcon } from "@/components/ui/button";
+import { Button, ButtonText, ButtonIcon } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 import { Box } from "@/components/ui/box";
 import { useRouter } from "expo-router";
@@ -14,7 +13,6 @@ import {
     Palette,
 } from "lucide-react-native";
 import { HStack } from "@/components/ui/hstack";
-import { Redirect } from "expo-router";
 import {
     Select,
     SelectTrigger,
@@ -27,21 +25,20 @@ import {
     SelectBackdrop,
 } from "@/components/ui/select";
 import { useTheme } from "@/contexts/ThemeContext";
-
-const STORAGE_KEY = "exam_preference";
+import { settingsManager } from "@/app/utils/storage/storage";
+import type { Exam } from "@/app/utils/storage/SettingsManager";
 
 export default function OnboardingStep2() {
-    const [selectedExam, setSelectedExam] = useState<string | null>(null);
+    const [selectedExam, setSelectedExam] = useState<Exam | null>(null);
     const [loading, setLoading] = useState(false);
     const router = useRouter();
     const { colorScheme, themePreference, setThemePreference } = useTheme();
 
-    const handleExamSelection = async (exam: string) => {
+    const handleExamSelection = async (exam: Exam) => {
         setSelectedExam(exam);
         setLoading(true);
-
         try {
-            await AsyncStorage.setItem(STORAGE_KEY, exam);
+            settingsManager.setExam(exam);
             console.log(`${exam} preference saved to storage`);
         } catch (error) {
             console.error("Error saving exam preference:", error);
@@ -62,13 +59,11 @@ export default function OnboardingStep2() {
             );
             return;
         }
-
         try {
-            await AsyncStorage.setItem("onboarded", "true");
+            settingsManager.setOnboarded(true);
         } catch (error) {
             console.error("Error finishing onboarding:", error);
         }
-
         router.replace("/tabs");
     };
 
@@ -169,7 +164,6 @@ export default function OnboardingStep2() {
                             )}
                         </HStack>
                     </Button>
-
                     <Button
                         onPress={() => handleExamSelection("NEET")}
                         disabled={loading}
@@ -213,7 +207,6 @@ export default function OnboardingStep2() {
                     </Button>
                 </Box>
             </Box>
-
             <Button
                 onPress={handleNext}
                 className={`w-full ${!selectedExam ? "opacity-50" : ""} mb-24 `}
