@@ -277,7 +277,7 @@ export default function Home() {
                             selectedExam === Exam.JEE
                                 ? "bg-blue-600"
                                 : "bg-green-600"
-                        } w-64`}>
+                        } w-64 border-2 dark:border-white`}>
                         <Heading size="" className={"text-white mb-1"}>
                             Exam in
                         </Heading>
@@ -292,7 +292,7 @@ export default function Home() {
                     <Card
                         size={"lg"}
                         variant={"filled"}
-                        className={`bg-yellow-500 dark:bg-yellow-600`}>
+                        className={`bg-yellow-500 dark:bg-yellow-500 border-2 dark:border-white`}>
                         <Heading size="" className={"text-white mb-1"}>
                             Current Streak
                         </Heading>
@@ -310,7 +310,7 @@ export default function Home() {
                     </Text>
                 </Box>
 
-                <Box className="mt-6 bg-typography-black p-4 rounded-lg">
+                <Box className="mt-6 bg-white dark:bg-typography-black p-4 rounded-lg">
                     {isLoadingPlan ? (
                         <Box className="gap-4">
                             <SkeletonText _lines={3} gap={2} />
@@ -323,10 +323,10 @@ export default function Home() {
                         <>
                             {Object.keys(todaysPlan.subjects).length === 0 ? (
                                 <Box className="items-center py-8">
-                                    <Text className="text-white text-center text-lg mb-2">
+                                    <Text className="text-gray-800 dark:text-white text-center text-lg mb-2">
                                         🎉 All topics completed!
                                     </Text>
-                                    <Text className="text-gray-400 text-center text-sm">
+                                    <Text className="text-gray-600 dark:text-gray-400 text-center text-sm">
                                         Pull down to generate tomorrow's plan
                                     </Text>
                                 </Box>
@@ -358,20 +358,20 @@ export default function Home() {
                             )}
                         </>
                     ) : (
-                        <Text className="text-white text-center">
+                        <Text className="text-gray-800 dark:text-white text-center">
                             Pull down to refresh and generate today's study plan
                         </Text>
                     )}
                 </Box>
 
                 <Card className="mt-4 p-4">
-                    <Text className="text-lg font-semibold mb-2">
+                    <Text className="text-lg font-semibold mb-2 text-gray-800 dark:text-white">
                         Overall Progress
                     </Text>
                     <Text className="text-2xl font-bold text-blue-600">
                         {topicsManager.getOverallProgress()}%
                     </Text>
-                    <Text className="text-gray-500 text-sm">
+                    <Text className="text-gray-500 dark:text-gray-400 text-sm">
                         Keep learning!
                     </Text>
                 </Card>

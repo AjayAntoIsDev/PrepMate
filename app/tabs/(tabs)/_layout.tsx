@@ -1,7 +1,7 @@
 import React from "react";
 import { Tabs } from "expo-router";
 import { useClientOnlyValue } from "@/components/useClientOnlyValue";
-import { Home, Zap, HelpCircle, Clipboard,BookCheck } from "lucide-react-native";
+import { Home, Zap, HelpCircle, Clipboard,BookCheck,Settings } from "lucide-react-native";
 
 function TabBarIcon(props: {
   IconComponent: React.ComponentType<{ size?: number; color?: string }>;
@@ -39,7 +39,7 @@ export default function TabLayout() {
               }}
           />
           <Tabs.Screen
-              name="tab2"
+              name="notes"
               options={{
                   title: "Notes",
                   tabBarIcon: ({ color }) => (
@@ -52,7 +52,7 @@ export default function TabLayout() {
               options={{
                   title: "Settings",
                   tabBarIcon: ({ color }) => (
-                      <TabBarIcon IconComponent={Clipboard} color={color} />
+                      <TabBarIcon IconComponent={Settings} color={color} />
                   ),
               }}
           />
