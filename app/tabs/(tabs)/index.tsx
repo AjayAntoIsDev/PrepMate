@@ -18,6 +18,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useState, useEffect, useCallback } from "react";
 import { Alert, RefreshControl, ScrollView } from "react-native";
 import React from "react";
+import { router } from "expo-router";
 import { Box } from "@/components/ui/box";
 import {
     getTodaysPlan,
@@ -50,6 +51,10 @@ export default function Home() {
     const [refreshing, setRefreshing] = useState(false);
     const [isFromCache, setIsFromCache] = useState(false);
 
+    const handleNotesPress = (topic: string) => {
+        router.push(`/notes/${selectedExam}/${encodeURIComponent(topic)}`);
+    };
+    
     useEffect(() => {
         const loadSelectedExam = async () => {
             try {
@@ -236,7 +241,8 @@ export default function Home() {
                                         action={"negative"}
                                         variant={"solid"}
                                         size={"sm"}
-                                        isDisabled={false}>
+                                        isDisabled={false}
+                                        onPress={() => handleNotesPress(topic)}>
                                         <ButtonIcon
                                             as={ScrollText}
                                             size={16}

@@ -142,6 +142,7 @@ export const DEEPINFRA_MODELS = {
     CODELLAMA_34B: "codellama/CodeLlama-34b-Instruct-hf",
     QWEN_2_5_72B: "Qwen/Qwen2.5-72B-Instruct",
     LLAMA_TURBO: "meta-llama/Llama-4-Maverick-17B-128E-Instruct-Turbo",
+    DEEPSEEK_V3: "deepseek-ai/DeepSeek-V3-0324-Turbo",
 };
 
 const aiClient = new AIClient();

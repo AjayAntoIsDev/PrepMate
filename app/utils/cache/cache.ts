@@ -91,6 +91,18 @@ export const CACHE_CONFIGS = {
     // Session data - no expiration but cleared on app restart
     SESSION: {
         maxEntries: 50
+    } as CacheConfig,
+    
+    // AI generated content - longer TTL, larger size allowance
+    AI_GENERATED_CONTENT: {
+        ttl: 7 * 24 * 60 * 60 * 1000, // 7 days
+        maxSize: 15 * 1024 * 1024, // 15MB
+        maxEntries: 100,
+        compress: true,
+        validator: (cached: any, context: any) => {
+            if (!context?.version) return true;
+            return cached.metadata?.version === context.version;
+        }
     } as CacheConfig
 } as const;
 

@@ -20,7 +20,7 @@ export default function Notes() {
     };
 
     return (
-        <ScrollView className="flex-1 bg-gray-50 dark:bg-gray-950">
+        <ScrollView className="flex-1 bg-gray-50 dark:bg-black">
             <VStack space="lg" className="px-6 py-8">
                 <TouchableOpacity
                     onPress={() => handleSubjectPress("Physics")}
