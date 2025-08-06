@@ -3,8 +3,10 @@ import config from "@/app/config.json";
 
 const TOPICS_KEYS = {
     COMPLETED_TOPICS: "topics.completed",
-    LAST_STUDIED: "topics.lastStudied",
+    COMPLETED_QUIZ: "topics.completedQuiz",
+    COMPLETED_NOTES: "topics.completedNotes",
     STUDY_STREAK: "topics.studyStreak",
+    LAST_STUDIED: "topics.lastStudied",
     TOTAL_STUDY_DAYS: "topics.totalStudyDays",
     LAST_STUDY_DATE: "topics.lastStudyDate",
 } as const;
@@ -14,6 +16,8 @@ export type CompletedTopics = {
 };
 
 export type ExamType = "JEE" | "NEET";
+
+export type ActivityType = "quiz" | "notes" | "general";
 
 class TopicsManager {
     private storage: MMKV;
@@ -36,26 +40,46 @@ class TopicsManager {
         return this.currentExam;
     }
 
-    // Get exam info
-    getExamInfo() {
-        return {
-            examDate: config[this.currentExam].examDate,
-            examData: config[this.currentExam].examData,
-            subjects: Object.keys(config[this.currentExam].subjects),
-        };
-    }
-
-    getCompletedTopics(): CompletedTopics {
-        const stored = this.storage.getString(TOPICS_KEYS.COMPLETED_TOPICS);
+    getCompletedTopics(activity: ActivityType): CompletedTopics {
+        let key: string;
+        switch (activity) {
+            case "quiz":
+                key = TOPICS_KEYS.COMPLETED_QUIZ;
+                break;
+            case "notes":
+                key = TOPICS_KEYS.COMPLETED_NOTES;
+                break;
+            default:
+                key = TOPICS_KEYS.COMPLETED_TOPICS;
+        }
+        const stored = this.storage.getString(key);
         return stored ? JSON.parse(stored) : {};
     }
 
-    setCompletedTopics(topics: CompletedTopics): void {
-        this.storage.set(TOPICS_KEYS.COMPLETED_TOPICS, JSON.stringify(topics));
+    setCompletedTopics(
+        topics: CompletedTopics,
+        activity: ActivityType
+    ): void {
+        let key: string;
+        switch (activity) {
+            case "quiz":
+                key = TOPICS_KEYS.COMPLETED_QUIZ;
+                break;
+            case "notes":
+                key = TOPICS_KEYS.COMPLETED_NOTES;
+                break;
+            default:
+                key = TOPICS_KEYS.COMPLETED_TOPICS;
+        }
+        this.storage.set(key, JSON.stringify(topics));
     }
 
-    markTopicCompleted(subject: string, topic: string): void {
-        const completed = this.getCompletedTopics();
+    markTopicCompleted(
+        subject: string,
+        topic: string,
+        activity: ActivityType = "general"
+    ): void {
+        const completed = this.getCompletedTopics(activity);
 
         if (!completed[subject]) {
             completed[subject] = [];
@@ -63,91 +87,38 @@ class TopicsManager {
 
         if (!completed[subject].includes(topic)) {
             completed[subject].push(topic);
-            this.setCompletedTopics(completed);
+            this.setCompletedTopics(completed, activity);
         }
     }
 
-    markTopicsCompleted(topics: CompletedTopics): void {
-        const completed = this.getCompletedTopics();
-
-        Object.keys(topics).forEach((subject) => {
-            if (!completed[subject]) {
-                completed[subject] = [];
-            }
-
-            topics[subject].forEach((topic) => {
-                if (!completed[subject].includes(topic)) {
-                    completed[subject].push(topic);
-                }
-            });
-        });
-
-        this.setCompletedTopics(completed);
-    }
-
-    markTopicNotCompleted(subject: string, topic: string): void {
-        const completed = this.getCompletedTopics();
+    markTopicNotCompleted(
+        subject: string,
+        topic: string,
+        activity: ActivityType = "general"
+    ): void {
+        const completed = this.getCompletedTopics(activity);
 
         if (completed[subject]) {
-            completed[subject] = completed[subject].filter((t) => t !== topic);
-
+            completed[subject] = completed[subject].filter(t => t !== topic);
             if (completed[subject].length === 0) {
                 delete completed[subject];
             }
-
-            this.setCompletedTopics(completed);
+            this.setCompletedTopics(completed, activity);
         }
     }
 
-    isTopicCompleted(subject: string, topic: string): boolean {
-        const completed = this.getCompletedTopics();
+    isTopicCompleted(
+        subject: string,
+        topic: string,
+        activity: ActivityType = "general"
+    ): boolean {
+        const completed = this.getCompletedTopics(activity);
         return completed[subject]?.includes(topic) || false;
     }
 
-    getSubjectCompletedTopics(subject: string): string[] {
-        const completed = this.getCompletedTopics();
-        return completed[subject] || [];
-    }
-
-    getSubjectCompletionCount(subject: string): number {
-        return this.getSubjectCompletedTopics(subject).length;
-    }
-
-    getNotCompletedTopics(): CompletedTopics {
+    getOverallProgress(activity: ActivityType = "general"): number {
         const allSubjects = this.getAllSubjects();
-        const completed = this.getCompletedTopics();
-        const notCompleted: CompletedTopics = {};
-
-        Object.keys(allSubjects).forEach((subject) => {
-            const completedTopicsInSubject = completed[subject] || [];
-            const notCompletedInSubject = allSubjects[subject].filter(
-                (topic) => !completedTopicsInSubject.includes(topic)
-            );
-
-            if (notCompletedInSubject.length > 0) {
-                notCompleted[subject] = notCompletedInSubject;
-            }
-        });
-
-        return notCompleted;
-    }
-
-    getSubjectNotCompletedTopics(subject: string): string[] {
-        const allSubjects = this.getAllSubjects();
-        const allTopicsInSubject = allSubjects[subject] || [];
-        const completedTopics = this.getSubjectCompletedTopics(subject);
-        return allTopicsInSubject.filter(
-            (topic) => !completedTopics.includes(topic)
-        );
-    }
-
-    getSubjectNotCompletedCount(subject: string): number {
-        return this.getSubjectNotCompletedTopics(subject).length;
-    }
-
-    getOverallProgress(): number {
-        const allSubjects = this.getAllSubjects();
-        const completed = this.getCompletedTopics();
+        const completed = this.getCompletedTopics(activity);
 
         const totalTopics = Object.values(allSubjects).reduce(
             (sum, topics) => sum + topics.length,
@@ -169,44 +140,9 @@ class TopicsManager {
         return allSubjects[subject] || [];
     }
 
-    getAvailableSubjects(): string[] {
-        return Object.keys(this.getAllSubjects());
-    }
 
     getStudyStreak(): number {
         return this.storage.getNumber(TOPICS_KEYS.STUDY_STREAK) || 0;
-    }
-
-    resetAllProgress(): void {
-        this.storage.delete(TOPICS_KEYS.COMPLETED_TOPICS);
-        this.storage.delete(TOPICS_KEYS.LAST_STUDIED);
-        this.storage.delete(TOPICS_KEYS.STUDY_STREAK);
-        this.storage.delete(TOPICS_KEYS.TOTAL_STUDY_DAYS);
-        this.storage.delete(TOPICS_KEYS.LAST_STUDY_DATE);
-    }
-
-    resetSubjectProgress(subject: string): void {
-        const completed = this.getCompletedTopics();
-        delete completed[subject];
-        this.setCompletedTopics(completed);
-    }
-
-    exportProgress(): string {
-        return JSON.stringify({
-            examType: this.currentExam,
-            completedTopics: this.getCompletedTopics(),
-            studyStreak: this.getStudyStreak(),
-            overallProgress: this.getOverallProgress(),
-            detailedStats: this.getDetailedStats(),
-            exportDate: new Date().toISOString(),
-        });
-    }
-
-    getStorageInfo(): { size: number; hasData: boolean } {
-        return {
-            size: this.storage.size,
-            hasData: this.storage.contains(TOPICS_KEYS.COMPLETED_TOPICS),
-        };
     }
 }
 

@@ -23,7 +23,7 @@ export default function SubjectTopics() {
     const { width } = Dimensions.get("window");
 
     const subjectName =
-        subject?.charAt(0).toUpperCase() + subject?.slice(1) || "";
+        subject?.charAt(0).toUpperCase() + subject?.slice(1) ;
     const topics = topicsManager.getSubjectTopics(subjectName);
 
     const handleTopicPress = (topic: string) => {

@@ -22,8 +22,8 @@ export default function TopicNotes() {
     }>();
 
     const subjectName =
-        subject?.charAt(0).toUpperCase() + subject?.slice(1) || "";
-    const topicName = decodeURIComponent(topic || "");
+        subject?.charAt(0).toUpperCase() + subject?.slice(1) ;
+    const topicName = decodeURIComponent(topic );
     
     const [markdownContent, setMarkdownContent] = useState<string>("");
     const [isLoading, setIsLoading] = useState<boolean>(true);

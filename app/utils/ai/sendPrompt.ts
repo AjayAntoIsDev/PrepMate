@@ -118,7 +118,7 @@ class AIClient {
             ...options,
         });
 
-        return response.choices[0]?.message?.content || "";
+        return response.choices[0]?.message?.content ;
     }
 
     async chat(
@@ -135,12 +135,6 @@ class AIClient {
 }
 
 export const DEEPINFRA_MODELS = {
-    DEEPSEEK_R1_70B: "deepseek-ai/DeepSeek-R1-Distill-Llama-70B",
-    LLAMA_3_1_70B: "meta-llama/Meta-Llama-3.1-70B-Instruct",
-    LLAMA_3_1_8B: "meta-llama/Meta-Llama-3.1-8B-Instruct",
-    MIXTRAL_8X7B: "mistralai/Mixtral-8x7B-Instruct-v0.1",
-    CODELLAMA_34B: "codellama/CodeLlama-34b-Instruct-hf",
-    QWEN_2_5_72B: "Qwen/Qwen2.5-72B-Instruct",
     LLAMA_TURBO: "meta-llama/Llama-4-Maverick-17B-128E-Instruct-Turbo",
     DEEPSEEK_V3: "deepseek-ai/DeepSeek-V3-0324-Turbo",
 };
@@ -166,29 +160,3 @@ export {
     type ChatCompletionOptions,
     type ChatCompletionResponse,
 };
-
-// Usage examples:
-/*
-  // Simple message
-  const response = await sendMessage("Hello!", DEEPINFRA_MODELS.DEEPSEEK_R1_70B);
-  
-  // Chat conversation
-  const messages = [
-    { role: 'system', content: 'You are a helpful assistant.' },
-    { role: 'user', content: 'What is TypeScript?' }
-  ];
-  const chatResponse = await chat(messages, DEEPINFRA_MODELS.LLAMA_3_1_70B);
-  
-  // Advanced options
-  const advancedResponse = await sendPrompt({
-    model: DEEPINFRA_MODELS.MIXTRAL_8X7B,
-    messages: [{ role: 'user', content: 'Write a poem about coding' }],
-    temperature: 0.8,
-    max_tokens: 500,
-    top_p: 0.9
-  });
-  
-  // With API key
-  const client = new DeepInfraClient('your-api-key-here');
-  const result = await client.sendMessage('Hello!');
-  */

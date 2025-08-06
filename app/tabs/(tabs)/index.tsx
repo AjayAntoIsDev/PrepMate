@@ -39,7 +39,6 @@ enum Exam {
     NEET = "NEET",
 }
 
-// Initialize universal cache manager
 const cacheManager = createCacheManager(storage);
 const studyPlanCache = new StudyPlanCache(cacheManager);
 
@@ -54,7 +53,7 @@ export default function Home() {
     const handleNotesPress = (topic: string) => {
         router.push(`/notes/${selectedExam}/${encodeURIComponent(topic)}`);
     };
-    
+
     useEffect(() => {
         const loadSelectedExam = async () => {
             try {
@@ -62,8 +61,9 @@ export default function Home() {
                 if (value) {
                     const exam = value as Exam;
                     setSelectedExam(exam);
-
+                    console.log("Loaded exam preference:", exam);
                     topicsManager.setExamType(exam);
+                    console.log("Setting exam type in topicsManager:", exam);
                     setStudyStreak(topicsManager.getStudyStreak());
                 }
             } catch (error) {
@@ -90,7 +90,8 @@ export default function Home() {
                 return;
             }
 
-            const completedTopics = topicsManager.getCompletedTopics();
+            const completedTopics = topicsManager.getCompletedTopics("quiz"); // This is intentional coz yea quiz are more important
+
             const progressHash = generateProgressHash(completedTopics);
 
             let plan: TodaysPlan;
@@ -110,9 +111,7 @@ export default function Home() {
                 daysLeft,
                 progressHash,
                 async () => {
-                    console.log(
-                        `Generating new AI plan for ${selectedExam}`
-                    );
+                    console.log(`Generating new AI plan for ${selectedExam}`);
                     return await getTodaysPlan(
                         daysLeft,
                         completedTopics,
@@ -150,42 +149,6 @@ export default function Home() {
         setRefreshing(false);
     }, [selectedExam]);
 
-    const markTopicCompleted = (subject: string, topic: string) => {
-        const isCompleted = topicsManager.isTopicCompleted(subject, topic);
-
-        if (isCompleted) {
-            topicsManager.markTopicNotCompleted(subject, topic);
-        } else {
-            topicsManager.markTopicCompleted(subject, topic);
-        }
-
-        setStudyStreak(topicsManager.getStudyStreak());
-
-        const allCompleted = Object.keys(todaysPlan?.subjects || {}).every(
-            (subj) =>
-                (todaysPlan?.subjects[subj] || []).every((t) =>
-                    topicsManager.isTopicCompleted(subj, t)
-                )
-        );
-
-        if (allCompleted) {
-            generateTodaysPlan(true);
-        } else {
-            const completedTopics = topicsManager.getCompletedTopics();
-            const currentHash = generateProgressHash(completedTopics);
-
-            const studyPlanKey = `${selectedExam}-${getDaysLeft(
-                selectedExam
-            )}-${cacheManager.generateCacheKey({
-                selectedExam,
-                getDaysLeft: getDaysLeft(selectedExam),
-            })}`;
-            if (cacheManager.has("study_plans", studyPlanKey)) {
-                generateTodaysPlan(true);
-            }
-        }
-    };
-
     function getDaysLeft(examType: Exam): number | null {
         const examConfig = config[examType];
         if (!examConfig || !examConfig.examDate) return null;
@@ -211,7 +174,18 @@ export default function Home() {
                     {topics.map((topic, index) => {
                         const isCompleted = topicsManager.isTopicCompleted(
                             subject,
-                            topic
+                            topic,
+                            "general"
+                        );
+                        const isQuizCompleted = topicsManager.isTopicCompleted(
+                            subject,
+                            topic,
+                            "quiz"
+                        );
+                        const isNotesCompleted = topicsManager.isTopicCompleted(
+                            subject,
+                            topic,
+                            "notes"
                         );
                         return (
                             <Box
@@ -227,10 +201,24 @@ export default function Home() {
                                 </Text>
                                 <Box className="flex-row items-center gap-2">
                                     <Button
-                                        action={"negative"}
+                                        action={
+                                            isQuizCompleted
+                                                ? "positive"
+                                                : "negative"
+                                        }
                                         variant={"solid"}
                                         size={"sm"}
-                                        isDisabled={false}>
+                                        isDisabled={false}
+                                        onPress={() => {
+                                            topicsManager.markTopicCompleted(
+                                                subject,
+                                                topic,
+                                                "quiz"
+                                            );
+                                            setStudyStreak(
+                                                topicsManager.getStudyStreak()
+                                            );
+                                        }}>
                                         <ButtonIcon
                                             as={BadgeQuestionMark}
                                             size={16}
@@ -238,11 +226,25 @@ export default function Home() {
                                         />
                                     </Button>
                                     <Button
-                                        action={"negative"}
+                                        action={
+                                            isNotesCompleted
+                                                ? "positive"
+                                                : "negative"
+                                        }
                                         variant={"solid"}
                                         size={"sm"}
                                         isDisabled={false}
-                                        onPress={() => handleNotesPress(topic)}>
+                                        onPress={() => {
+                                            topicsManager.markTopicCompleted(
+                                                subject,
+                                                topic,
+                                                "notes"
+                                            );
+                                            setStudyStreak(
+                                                topicsManager.getStudyStreak()
+                                            );
+                                            handleNotesPress(topic);
+                                        }}>
                                         <ButtonIcon
                                             as={ScrollText}
                                             size={16}
