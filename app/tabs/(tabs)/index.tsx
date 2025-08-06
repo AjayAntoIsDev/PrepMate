@@ -53,6 +53,10 @@ export default function Home() {
         router.push(`/notes/${selectedExam}/${encodeURIComponent(topic)}`);
     };
 
+    const handleQuizPress = (topic: string) => {
+        router.push(`/quiz/${selectedExam}/${encodeURIComponent(topic)}`);
+    };
+
     useEffect(() => {
         const loadSelectedExam = async () => {
             try {
@@ -200,6 +204,7 @@ export default function Home() {
                                             setStudyStreak(
                                                 topicsManager.getStudyStreak()
                                             );
+                                            handleQuizPress(topic);
                                         }}>
                                         <ButtonIcon
                                             as={BadgeQuestionMark}
