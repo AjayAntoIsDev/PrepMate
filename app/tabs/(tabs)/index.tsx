@@ -48,7 +48,6 @@ export default function Home() {
     const [isLoadingPlan, setIsLoadingPlan] = useState(false);
     const [studyStreak, setStudyStreak] = useState(0);
     const [refreshing, setRefreshing] = useState(false);
-    const [isFromCache, setIsFromCache] = useState(false);
 
     const handleNotesPress = (topic: string) => {
         router.push(`/notes/${selectedExam}/${encodeURIComponent(topic)}`);
@@ -94,17 +93,10 @@ export default function Home() {
 
             const progressHash = generateProgressHash(completedTopics);
 
-            let plan: TodaysPlan;
-
-            if (forceRegenerate) {
-                cacheManager.delete(
-                    "study_plans",
-                    `${selectedExam}-${daysLeft}-${cacheManager.generateCacheKey(
-                        { selectedExam, daysLeft }
-                    )}`
-                );
-                setIsFromCache(false);
-            }
+            let plan: TodaysPlan;        if (forceRegenerate) {
+            const cacheKey = `${selectedExam}-${daysLeft}-${cacheManager.generateCacheKey({ examType: selectedExam, daysLeft })}`;
+            cacheManager.delete("study_plans", cacheKey);
+        }
 
             plan = await studyPlanCache.getTodaysPlan(
                 selectedExam,
@@ -119,16 +111,6 @@ export default function Home() {
                     );
                 }
             );
-
-            const wasFromCache =
-                !forceRegenerate &&
-                cacheManager.has(
-                    "study_plans",
-                    `${selectedExam}-${daysLeft}-${cacheManager.generateCacheKey(
-                        { selectedExam, daysLeft }
-                    )}`
-                );
-            setIsFromCache(wasFromCache);
 
             setTodaysPlan(plan);
         } catch (error) {

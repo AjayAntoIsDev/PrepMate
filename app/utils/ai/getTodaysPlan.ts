@@ -43,7 +43,7 @@ async function getTodaysPlan(
             subjects: {},
             totalTopics: 0,
             reasoning:
-                "All subjects completed!",
+                "All subjects completed",
         };
     }
 
@@ -126,26 +126,3 @@ export {
     type TodaysPlan,
     type ExamType,
 };
-
-// Usage examples:
-/*
-// JEE example
-const jeeCompleted = {
-  "Physics": ["Units & Measurements", "Kinematics"],
-  "Chemistry": ["Some Basic Concepts of Chemistry"],
-  "Mathematics": ["Sets, Relations & Functions"]
-};
-
-const jeePlan = await getTodaysPlan(45, jeeCompleted, 'JEE');
-console.log(jeePlan);
-
-// NEET example  
-const neetCompleted = {
-  "Physics": ["Physical World & Measurement"],
-  "Chemistry": ["Structure of Atom"],
-  "Biology": ["Diversity in Living World", "Cell Structure & Function"]
-};
-
-const neetPlan = await getTodaysPlan(60, neetCompleted, 'NEET');
-console.log(neetPlan);
-*/

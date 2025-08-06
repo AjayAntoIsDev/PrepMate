@@ -1,7 +1,15 @@
 import React from "react";
 import { Tabs } from "expo-router";
 import { useClientOnlyValue } from "@/components/useClientOnlyValue";
-import { Home, Zap, HelpCircle, Clipboard,BookCheck,Settings } from "lucide-react-native";
+import {
+    Home,
+    Zap,
+    HelpCircle,
+    Clipboard,
+    BookCheck,
+    Settings,
+    BadgeQuestionMark,
+} from "lucide-react-native";
 
 function TabBarIcon(props: {
   IconComponent: React.ComponentType<{ size?: number; color?: string }>;
@@ -30,11 +38,11 @@ export default function TabLayout() {
           />
 
           <Tabs.Screen
-              name="tab1"
+              name="quiz"
               options={{
-                  title: "Practice",
+                  title: "Quiz",
                   tabBarIcon: ({ color }) => (
-                      <TabBarIcon IconComponent={BookCheck} color={color} />
+                      <TabBarIcon IconComponent={BadgeQuestionMark} color={color} />
                   ),
               }}
           />
