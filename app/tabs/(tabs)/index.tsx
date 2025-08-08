@@ -64,9 +64,7 @@ export default function Home() {
                 if (value) {
                     const exam = value as Exam;
                     setSelectedExam(exam);
-                    console.log("Loaded exam preference:", exam);
                     topicsManager.setExamType(exam);
-                    console.log("Setting exam type in topicsManager:", exam);
                     setStudyStreak(topicsManager.getStudyStreak());
                 }
             } catch (error) {
@@ -93,16 +91,19 @@ export default function Home() {
                 return;
             }
 
-            const completedTopics = topicsManager.getCompletedTopics("quiz"); // This is intentional coz yea quiz are more important
+            const completedTopics = topicsManager.getCompletedTopics("quiz");
 
-            const progressHash = generateProgressHash(completedTopics);
+            // Little hack coz i am lazy
+            const progressHash = getTodayString();
 
-            let plan: TodaysPlan;        if (forceRegenerate) {
-            const cacheKey = `${selectedExam}-${daysLeft}-${cacheManager.generateCacheKey({ examType: selectedExam, daysLeft })}`;
-            cacheManager.delete("study_plans", cacheKey);
-        }
+            if (forceRegenerate) {
+                const cacheKey = `${selectedExam}-${daysLeft}-${cacheManager.generateCacheKey(
+                    { examType: selectedExam, daysLeft }
+                )}`;
+                cacheManager.delete("study_plans", cacheKey);
+            }
 
-            plan = await studyPlanCache.getTodaysPlan(
+            const plan: TodaysPlan = await studyPlanCache.getTodaysPlan(
                 selectedExam,
                 daysLeft,
                 progressHash,
@@ -123,10 +124,6 @@ export default function Home() {
         } finally {
             setIsLoadingPlan(false);
         }
-    };
-
-    const generateProgressHash = (completedTopics: any): string => {
-        return cacheManager.generateCacheKey(completedTopics);
     };
 
     const onRefresh = useCallback(async () => {
@@ -158,11 +155,6 @@ export default function Home() {
                 </Text>
                 <Box className="gap-2 mt-2">
                     {topics.map((topic, index) => {
-                        const isCompleted = topicsManager.isTopicCompleted(
-                            subject,
-                            topic,
-                            "general"
-                        );
                         const isQuizCompleted = topicsManager.isTopicCompleted(
                             subject,
                             topic,
@@ -177,12 +169,7 @@ export default function Home() {
                             <Box
                                 key={index}
                                 className="flex-row items-center justify-between">
-                                <Text
-                                    className={`text-sm ${
-                                        isCompleted
-                                            ? "text-green-500 line-through"
-                                            : "text-black dark:text-white"
-                                    }`}>
+                                <Text className={`text-sm  dark:text-white`}>
                                     {topic}
                                 </Text>
                                 <Box className="flex-row items-center gap-2">
@@ -196,11 +183,6 @@ export default function Home() {
                                         size={"sm"}
                                         isDisabled={false}
                                         onPress={() => {
-                                            topicsManager.markTopicCompleted(
-                                                subject,
-                                                topic,
-                                                "quiz"
-                                            );
                                             setStudyStreak(
                                                 topicsManager.getStudyStreak()
                                             );

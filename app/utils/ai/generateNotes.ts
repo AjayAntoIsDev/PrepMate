@@ -1,4 +1,4 @@
-import { sendPrompt, DEEPINFRA_MODELS } from "./sendPrompt";
+import { sendPrompt, MINOA_MODELS } from "./sendPrompt";
 import { createCacheManager, CACHE_CONFIGS } from "../cache/cache";
 import {storage} from "../storage/storage";
 
@@ -112,7 +112,7 @@ Topic: ${topic}
 Exam: ${exam}`;
 
         const response = await sendPrompt({
-            model: DEEPINFRA_MODELS.DEEPSEEK_V3,
+            model: MINOA_MODELS.LLAMA_3_3_70B_VERSATILE,
             messages: [
                 {
                     role: "system",

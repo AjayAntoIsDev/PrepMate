@@ -39,13 +39,13 @@ interface ChatCompletionResponse {
 }
 
 class AIClient {
-    private baseUrl: string = "https://api.deepinfra.com/v1/openai";
+    private baseUrl: string = "https://ai.minoa.cat/v1";
 
     async sendPrompt(
         options: ChatCompletionOptions
     ): Promise<ChatCompletionResponse> {
         const {
-            model = "deepseek-ai/DeepSeek-R1-Distill-Llama-70B",
+            model = "groq/llama-3.3-70b-versatile",
             messages,
             temperature,
             max_tokens,
@@ -134,9 +134,24 @@ class AIClient {
     }
 }
 
-export const DEEPINFRA_MODELS = {
-    LLAMA_TURBO: "meta-llama/Llama-4-Maverick-17B-128E-Instruct-Turbo",
-    DEEPSEEK_V3: "deepseek-ai/DeepSeek-V3-0324-Turbo",
+export const MINOA_MODELS = {
+    GPT_4: "copilot-more/gpt-4",
+    
+    LLAMA_4_MAVERICK: "hackclub/meta-llama/llama-4-maverick-17b-128e-instruct",
+    LLAMA_3_3_70B_VERSATILE: "groq/llama-3.3-70b-versatile",
+    LLAMA_3_3_70B_SPECDEC: "groq/llama-3.3-70b-specdec",
+    LLAMA_3_1_8B_INSTANT: "groq/llama-3.1-8b-instant",
+    LLAMA_3_70B_8192: "groq/llama3-70b-8192",
+    LLAMA_3_8B_8192: "groq/llama3-8b-8192",
+    LLAMA_GUARD_3_8B: "groq/llama-guard-3-8b",
+    
+    MISTRAL_SMALL_LATEST: "mistral/mistral-small-latest",
+    PIXTRAL_12B: "mistral/pixtral-12b-2409",
+    OPEN_MISTRAL_NEMO: "mistral/open-mistral-nemo",
+    OPEN_CODESTRAL_MAMBA: "mistral/open-codestral-mamba",
+    
+    ALLAM_2_7B: "groq/allam-2-7b",
+    GEMMA2_9B_IT: "groq/gemma2-9b-it",
 };
 
 const aiClient = new AIClient();

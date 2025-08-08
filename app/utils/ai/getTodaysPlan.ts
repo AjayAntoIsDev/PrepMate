@@ -1,4 +1,4 @@
-import { sendPrompt, DEEPINFRA_MODELS } from "./sendPrompt";
+import { sendPrompt, MINOA_MODELS } from "./sendPrompt";
 import examConfig from "@/app/config.json";
 
 interface CompletedSubjects {
@@ -84,7 +84,7 @@ ${JSON.stringify(remainingSubjects, null, 2)}
 Return only the JSON object, no additional text.`;
     try {
         const response = await sendPrompt({
-            model: DEEPINFRA_MODELS.LLAMA_TURBO,
+            model: MINOA_MODELS.LLAMA_3_8B_8192,
             messages: [{ role: "user", content: prompt }],
             temperature: 0.3,
             max_tokens: 800,
