@@ -346,7 +346,7 @@ export default function Home() {
                         Overall Progress
                     </Text>
                     <Text className="text-2xl font-bold text-blue-600">
-                        {topicsManager.getOverallProgress()}%
+                        {topicsManager.getOverallProgress("quiz")}%
                     </Text>
                     <Text className="text-gray-500 dark:text-gray-400 text-sm">
                         Keep learning!
