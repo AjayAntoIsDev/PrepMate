@@ -60,7 +60,7 @@ export default function Home() {
     useEffect(() => {
         const loadSelectedExam = async () => {
             try {
-                const value = await AsyncStorage.getItem("exam_preference");
+                const value = settingsManager.getExam();
                 if (value) {
                     const exam = value as Exam;
                     setSelectedExam(exam);
