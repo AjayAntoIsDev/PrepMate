@@ -8,7 +8,8 @@ import { Box } from "@/components/ui/box";
 import { Button, ButtonText, ButtonIcon } from "@/components/ui/button";
 import { HStack } from "@/components/ui/hstack";
 import { VStack } from "@/components/ui/vstack";
-import { ArrowLeft, RefreshCw, Trash2 } from "lucide-react-native";
+import { ArrowLeft, RefreshCw, Trash2, MessageSquare } from "lucide-react-native";
+import { Fab, FabIcon } from "@/components/ui/fab";
 import Markdown from "react-native-marked";
 import { generateNotes, clearNotesCache, hasNotesInCache } from "@/app/utils/ai/generateNotes";
 import { topicsManager } from "@/app/utils/storage/storage";
@@ -195,6 +196,12 @@ Please try again or contact support if the issue persists.`);
                     </Box>
                 )}
             </ScrollView>
+            <Fab
+                placement="bottom right"
+                onPress={() => router.push(`/ask-ai/${subject}?topic=${encodeURIComponent(topicName)}`)}
+                className="bg-primary-600 active:bg-primary-700">
+                <FabIcon as={MessageSquare} />
+            </Fab>
         </Box>
     );
 }
