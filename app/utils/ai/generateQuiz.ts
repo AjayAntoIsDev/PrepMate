@@ -1,4 +1,4 @@
-import { sendPrompt, MINOA_MODELS } from "./sendPrompt";
+import { sendPrompt, CEREBRAS_MODELS } from "./sendPrompt";
 import { createCacheManager, CACHE_CONFIGS } from "../cache/cache";
 import { storage } from "../storage/storage";
 
@@ -130,7 +130,7 @@ Return the quiz in the exact JSON format specified in the system prompt.`;
         console.log(`Generating new quiz: ${subject} - ${topic} (${difficulty})`);
 
         const response = await sendPrompt({
-            model: MINOA_MODELS.LLAMA_3_1_8B_INSTANT,
+            model: CEREBRAS_MODELS.LLAMA_3_1_8B,
             messages: [
                 {
                     role: "system",
@@ -142,7 +142,7 @@ Return the quiz in the exact JSON format specified in the system prompt.`;
                 },
             ],
             temperature: 0.8,
-            max_tokens: 4000,
+            max_completion_tokens: 4000,
         });
 
         const aiResponse = response.choices[0]?.message?.content;

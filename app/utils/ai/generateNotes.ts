@@ -1,4 +1,4 @@
-import { sendPrompt, MINOA_MODELS } from "./sendPrompt";
+import { sendPrompt, CEREBRAS_MODELS } from "./sendPrompt";
 import { createCacheManager, CACHE_CONFIGS } from "../cache/cache";
 import {storage} from "../storage/storage";
 
@@ -112,7 +112,7 @@ Topic: ${topic}
 Exam: ${exam}`;
 
         const response = await sendPrompt({
-            model: MINOA_MODELS.LLAMA_3_3_70B_VERSATILE,
+            model: CEREBRAS_MODELS.LLAMA_3_3_70B,
             messages: [
                 {
                     role: "system",
@@ -124,7 +124,7 @@ Exam: ${exam}`;
                 }
             ],
             temperature: 0.7,
-            max_tokens: 6000,
+            max_completion_tokens: 6000,
         });
 
         const aiResponse = response.choices[0]?.message?.content;

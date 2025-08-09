@@ -1,3 +1,5 @@
+import { CEREBRAS_API_KEY } from './apiKey';
+
 interface Message {
     role: "system" | "user" | "assistant";
     content: string;
@@ -7,15 +9,11 @@ interface ChatCompletionOptions {
     model?: string;
     messages: Message[];
     temperature?: number;
-    max_tokens?: number;
+    max_completion_tokens?: number;
     top_p?: number;
-    frequency_penalty?: number;
-    presence_penalty?: number;
-    stop?: string | string[];
+    stop?: string;
     stream?: boolean;
-    n?: number;
-    logit_bias?: Record<string, number>;
-    user_id?: string;
+    user?: string;
 }
 
 interface ChatCompletionResponse {
@@ -39,24 +37,21 @@ interface ChatCompletionResponse {
 }
 
 class AIClient {
-    private baseUrl: string = "https://ai.minoa.cat/v1";
+    private baseUrl: string = "https://api.cerebras.ai/v1";
+    private apiKey: string = CEREBRAS_API_KEY;
 
     async sendPrompt(
         options: ChatCompletionOptions
     ): Promise<ChatCompletionResponse> {
         const {
-            model = "groq/llama-3.3-70b-versatile",
+            model = "llama3.1-8b",
             messages,
             temperature,
-            max_tokens,
+            max_completion_tokens,
             top_p,
-            frequency_penalty,
-            presence_penalty,
             stop,
             stream = false,
-            n,
-            logit_bias,
-            user_id,
+            user,
         } = options;
 
         const requestBody: any = {
@@ -66,19 +61,14 @@ class AIClient {
         };
 
         if (temperature !== undefined) requestBody.temperature = temperature;
-        if (max_tokens !== undefined) requestBody.max_tokens = max_tokens;
+        if (max_completion_tokens !== undefined) requestBody.max_completion_tokens = max_completion_tokens;
         if (top_p !== undefined) requestBody.top_p = top_p;
-        if (frequency_penalty !== undefined)
-            requestBody.frequency_penalty = frequency_penalty;
-        if (presence_penalty !== undefined)
-            requestBody.presence_penalty = presence_penalty;
         if (stop !== undefined) requestBody.stop = stop;
-        if (n !== undefined) requestBody.n = n;
-        if (logit_bias !== undefined) requestBody.logit_bias = logit_bias;
-        if (user_id !== undefined) requestBody.user = user_id;
+        if (user !== undefined) requestBody.user = user;
 
         const headers: Record<string, string> = {
             "Content-Type": "application/json",
+            "Authorization": `Bearer ${this.apiKey}`,
         };
 
         try {
@@ -134,24 +124,17 @@ class AIClient {
     }
 }
 
-export const MINOA_MODELS = {
-    GPT_4: "copilot-more/gpt-4",
-    
-    LLAMA_4_MAVERICK: "hackclub/meta-llama/llama-4-maverick-17b-128e-instruct",
-    LLAMA_3_3_70B_VERSATILE: "groq/llama-3.3-70b-versatile",
-    LLAMA_3_3_70B_SPECDEC: "groq/llama-3.3-70b-specdec",
-    LLAMA_3_1_8B_INSTANT: "groq/llama-3.1-8b-instant",
-    LLAMA_3_70B_8192: "groq/llama3-70b-8192",
-    LLAMA_3_8B_8192: "groq/llama3-8b-8192",
-    LLAMA_GUARD_3_8B: "groq/llama-guard-3-8b",
-    
-    MISTRAL_SMALL_LATEST: "mistral/mistral-small-latest",
-    PIXTRAL_12B: "mistral/pixtral-12b-2409",
-    OPEN_MISTRAL_NEMO: "mistral/open-mistral-nemo",
-    OPEN_CODESTRAL_MAMBA: "mistral/open-codestral-mamba",
-    
-    ALLAM_2_7B: "groq/allam-2-7b",
-    GEMMA2_9B_IT: "groq/gemma2-9b-it",
+export const CEREBRAS_MODELS = {
+    LLAMA_4_SCOUT_17B: "llama-4-scout-17b-16e-instruct",
+    LLAMA_3_1_8B: "llama3.1-8b",
+    LLAMA_3_3_70B: "llama-3.3-70b",
+    LLAMA_4_MAVERICK_17B: "llama-4-maverick-17b-128e-instruct",
+    QWEN_3_32B: "qwen-3-32b",
+    QWEN_3_235B_A22B_INSTRUCT: "qwen-3-235b-a22b-instruct-2507",
+    QWEN_3_235B_A22B_THINKING: "qwen-3-235b-a22b-thinking-2507",
+    QWEN_3_CODER_480B: "qwen-3-coder-480b",
+    GPT_OSS_120B: "gpt-oss-120b",
+    DEEPSEEK_R1_DISTILL_LLAMA_70B: "deepseek-r1-distill-llama-70b",
 };
 
 const aiClient = new AIClient();

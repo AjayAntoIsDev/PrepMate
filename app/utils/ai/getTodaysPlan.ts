@@ -1,4 +1,4 @@
-import { sendPrompt, MINOA_MODELS } from "./sendPrompt";
+import { sendPrompt, CEREBRAS_MODELS } from "./sendPrompt";
 import examConfig from "@/app/config.json";
 
 interface CompletedSubjects {
@@ -84,10 +84,10 @@ ${JSON.stringify(remainingSubjects, null, 2)}
 Return only the JSON object, no additional text.`;
     try {
         const response = await sendPrompt({
-            model: MINOA_MODELS.LLAMA_3_8B_8192,
+            model: CEREBRAS_MODELS.LLAMA_3_1_8B,
             messages: [{ role: "user", content: prompt }],
             temperature: 0.3,
-            max_tokens: 800,
+            max_completion_tokens: 800,
         });
 
         const aiResponse = response.choices[0]?.message?.content;
