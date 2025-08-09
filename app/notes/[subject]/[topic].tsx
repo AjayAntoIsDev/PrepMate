@@ -188,7 +188,7 @@ Please try again or contact support if the issue persists.`);
                                     backgroundColor:
                                         colorScheme === "dark"
                                             ? "#151515"
-                                            : "#f8f8f8",
+                                            : "#FFFFFF",
                                 },
                             }}
                             theme={getMarkdownTheme()}
@@ -198,7 +198,13 @@ Please try again or contact support if the issue persists.`);
             </ScrollView>
             <Fab
                 placement="bottom right"
-                onPress={() => router.push(`/ask-ai/${subject}?topic=${encodeURIComponent(topicName)}`)}
+                onPress={() =>
+                    router.push(
+                        `/ask-ai/${subject}?topic=${encodeURIComponent(
+                            topicName
+                        )}`
+                    )
+                }
                 className="bg-primary-600 active:bg-primary-700">
                 <FabIcon as={MessageSquare} />
             </Fab>

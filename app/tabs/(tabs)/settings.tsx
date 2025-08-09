@@ -44,6 +44,8 @@ import {
 } from "lucide-react-native";
 import { useTheme } from "@/contexts/ThemeContext";
 import { Colors } from "@/constants/Colors";
+import { settingsManager, topicsManager } from "@/app/utils/storage/storage";
+import storage from "@/app/utils/storage/storage";
 
 const SETTINGS_KEYS = {
     THEME_PREFERENCE: "theme_preference", // 'light', 'dark', 'system'
@@ -55,15 +57,17 @@ interface SettingsState {
     themePreference: "light" | "dark" | "system";
     notificationsEnabled: boolean;
     soundEnabled: boolean;
+    exam: "JEE" | "NEET";
 }
 
 export default function SettingsScreen() {
     const { colorScheme, themePreference, setThemePreference } = useTheme();
-    const [settings, setSettings] = useState<SettingsState>({
+    const [settings, setSettings] = useState<SettingsState>(() => ({
         themePreference: "system",
         notificationsEnabled: true,
         soundEnabled: true,
-    });
+        exam: settingsManager.getExam(),
+    }));
 
     const [loading, setLoading] = useState(true);
     const saveTimeoutRef = useRef<Record<string, NodeJS.Timeout>>({});
@@ -95,6 +99,7 @@ export default function SettingsScreen() {
                 ...prev,
                 notificationsEnabled: settingsData[0] !== "false",
                 soundEnabled: settingsData[1] !== "false",
+                exam: settingsManager.getExam(),
             }));
         } catch (error) {
             console.error("Error loading settings:", error);
@@ -141,6 +146,38 @@ export default function SettingsScreen() {
         }, 300);
     };
 
+    const handleClearAllData = () => {
+        Alert.alert(
+            "Confirm Reset",
+            "This will permanently delete all your app data (progress, settings, exam selection). Are you sure?",
+            [
+                { text: "Cancel", style: "cancel" },
+                {
+                    text: "Delete",
+                    style: "destructive",
+                    onPress: async () => {
+                        try {
+                            settingsManager.clearAllStorage();
+                            await AsyncStorage.multiRemove([
+                                SETTINGS_KEYS.THEME_PREFERENCE,
+                            ]);
+                            topicsManager.setExamType("JEE");
+                            setThemePreference("system");
+                            setSettings({
+                                themePreference: "system",
+                                exam: "JEE",
+                            });
+                            Alert.alert("Data Cleared", "All app data has been removed.");
+                        } catch (e) {
+                            console.error("Failed to clear data", e);
+                            Alert.alert("Error", "Failed to clear data. Please try again.");
+                        }
+                    },
+                },
+            ]
+        );
+    };
+
     if (loading) {
         return (
             <View className="flex-1 justify-center items-center">
@@ -152,7 +189,6 @@ export default function SettingsScreen() {
     return (
         <ScrollView className="flex-1" contentContainerStyle={{ padding: 16 }}>
             <VStack space="lg">
-                {/* Appearance Section */}
                 <Card className="p-4">
                     <VStack space="md">
                         <HStack
@@ -214,39 +250,47 @@ export default function SettingsScreen() {
                     </VStack>
 
                     <VStack space="md" className="mt-8">
-                        <HStack className="justify-between items-center">
+                        <HStack
+                            space="sm"
+                            className="items-center justify-between">
                             <HStack className="items-center" space="sm">
-                                {settings.notificationsEnabled ? (
-                                    <Bell
-                                        size={18}
-                                        color={
-                                            colorScheme === "dark"
-                                                ? "white"
-                                                : "black"
-                                        }
-                                    />
-                                ) : (
-                                    <BellOff
-                                        size={18}
-                                        color={
-                                            colorScheme === "dark"
-                                                ? "white"
-                                                : "black"
-                                        }
-                                    />
-                                )}
-                                <Heading size="lg">Notifications</Heading>
+                                <Heading size="lg">Exam</Heading>
                             </HStack>
-                            <Switch
-                                value={settings.notificationsEnabled}
-                                onValueChange={(value) =>
-                                    updateSetting(
-                                        "notificationsEnabled",
-                                        value,
-                                        SETTINGS_KEYS.NOTIFICATIONS_ENABLED
-                                    )
-                                }
-                            />
+
+                            <Select
+                                selectedValue={settings.exam}
+                                onValueChange={(value) => {
+                                    setSettings((prev) => ({
+                                        ...prev,
+                                        exam: value as any,
+                                    }));
+                                    settingsManager.setExam(value as any);
+                                    topicsManager.setExamType(value as any);
+                                }}
+                            >
+                                <SelectTrigger className="h-12">
+                                    <SelectInput
+                                        placeholder="Select exam"
+                                        value={settings.exam}
+                                    />
+                                    <SelectIcon as={ChevronRight} />
+                                </SelectTrigger>
+                                <SelectPortal>
+                                    <SelectBackdrop />
+                                    <SelectContent>
+                                        <SelectScrollView>
+                                            <SelectItem
+                                                label="JEE"
+                                                value="JEE"
+                                            ></SelectItem>
+                                            <SelectItem
+                                                label="NEET"
+                                                value="NEET"
+                                            ></SelectItem>
+                                        </SelectScrollView>
+                                    </SelectContent>
+                                </SelectPortal>
+                            </Select>
                         </HStack>
                     </VStack>
                 </Card>
@@ -273,24 +317,26 @@ export default function SettingsScreen() {
                                 <Text>Platform</Text>
                                 <Text>{Platform.OS}</Text>
                             </HStack>
-
-                            <HStack className="justify-between">
-                                <Text>Current Theme</Text>
-                                <Text>
-                                    {settings.themePreference === "system"
-                                        ? `System`
-                                        : settings.themePreference
-                                              .charAt(0)
-                                              .toUpperCase() +
-                                          settings.themePreference.slice(1)}
-                                </Text>
-                            </HStack>
                         </VStack>
                     </VStack>
                 </Card>
 
+                <Card className="p-4 border border-red-500 bg-red-50 dark:bg-red-950/30">
+                    <VStack space="md">
+                        <Heading size="lg" className="text-red-600 dark:text-red-400">Danger Zone</Heading>
+                        <Text size="sm" className="text-red-600 dark:text-red-400">
+                            Clearing data will remove all progress, notes, quiz completions and reset settings.
+                        </Text>
+                        <Button
+                            className="bg-red-600 dark:bg-red-700"
+                            onPress={handleClearAllData}
+                        >
+                            <Text className="text-white font-semibold">Clear All Data</Text>
+                        </Button>
+                    </VStack>
+                </Card>
+
                 <VStack space="md" className="mt-4">
-                    {/* Made with ♥️ by Ajay Anto */}
                     <Text size="sm" className="text-center">
                         Made with ♥️ by Ajay Anto
                     </Text>

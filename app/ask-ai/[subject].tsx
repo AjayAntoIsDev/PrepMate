@@ -61,7 +61,7 @@ export default function AskAISubject() {
                             m.id === "sys"
                                 ? {
                                       ...m,
-                                      content: `Got questions on ${rawTopic}?`,
+                                      content: `Got any questions on ${rawTopic}?`,
                                   }
                                 : m
                         )
