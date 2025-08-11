@@ -130,7 +130,7 @@ Return the quiz in the exact JSON format specified in the system prompt.`;
         console.log(`Generating new quiz: ${subject} - ${topic} (${difficulty})`);
 
         const response = await sendPrompt({
-            model: CEREBRAS_MODELS.LLAMA_3_1_8B,
+            model: CEREBRAS_MODELS.GPT_OSS_120B,
             messages: [
                 {
                     role: "system",

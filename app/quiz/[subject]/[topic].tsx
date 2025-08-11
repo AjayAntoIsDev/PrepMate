@@ -35,24 +35,7 @@ export default function TopicQuiz() {
         topic: string;
     }>();
     const topicName = decodeURIComponent(topic);
-
-    // More hacks coz i am lazy like that
-    const getSubjectName = (rawSubject: string, topicName: string): string => {
-        if (
-            rawSubject?.toLowerCase() === "jee" ||
-            rawSubject?.toLowerCase() === "neet"
-        ) {
-            const examType = topicsManager.getCurrentExamType();
-            const config = require("@/app/config.json");
-            const subjects = config[examType].subjects;
-            for (const [subjectKey, topics] of Object.entries(subjects)) {
-                if ((topics as string[]).includes(topicName)) {
-                    return subjectKey;
-                }
-            }
-        }
-    };
-    const subjectName = getSubjectName(subject!, topicName);
+    
     const [quizState, setQuizState] = useState<QuizState>("loading");
     const [quiz, setQuiz] = useState<Quiz | null>(null);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -65,6 +48,7 @@ export default function TopicQuiz() {
         router.back();
     };
     const getSubjectColor = (subject: string) => {
+        console.log(subject)
         const subjectColors: {
             [key: string]: string;
         } = {
@@ -80,13 +64,12 @@ export default function TopicQuiz() {
         try {
             setQuizState("loading");
 
-            // Check if topic was already completed using the proper subject name
             setWasAlreadyCompleted(
-                topicsManager.isTopicCompleted(subjectName!, topicName, "quiz")
+                topicsManager.isTopicCompleted(subject!, topicName, "quiz")
             );
             const examType = topicsManager.getCurrentExamType();
             const result = await generateQuiz({
-                subject: subjectName,
+                subject: subject,
                 topic: topicName,
                 exam: examType,
                 difficulty: "medium",
@@ -153,17 +136,16 @@ export default function TopicQuiz() {
         );
         setScore(correctAnswers);
 
-        // Mark topic as completed if score is 70% or higher using the proper subject name
+        // Mark topic as completed if score is 70% or higher
         const scorePercentage = (correctAnswers / quiz!.totalQuestions) * 100;
         if (scorePercentage >= 70 && !wasAlreadyCompleted) {
-            topicsManager.markTopicCompleted(subjectName!, topicName, "quiz");
+            topicsManager.markTopicCompleted(subject!, topicName, "quiz");
         }
         setQuizState("completed");
     };
     const retryQuiz = () => {
-        // Check current completion status again using the proper subject name
         setWasAlreadyCompleted(
-            topicsManager.isTopicCompleted(subjectName!, topicName, "quiz")
+            topicsManager.isTopicCompleted(subject!, topicName, "quiz")
         );
         setSelectedAnswers(new Array(quiz!.questions.length).fill(-1));
         setCurrentQuestionIndex(0);
@@ -173,7 +155,7 @@ export default function TopicQuiz() {
     };
     useEffect(() => {
         loadQuiz();
-    }, [topicName, subjectName]);
+    }, [topicName, subject]);
     const currentQuestion = quiz?.questions[currentQuestionIndex];
     const selectedAnswer = selectedAnswers[currentQuestionIndex];
     const isCorrect = selectedAnswer === currentQuestion?.correctAnswer;
@@ -190,7 +172,7 @@ export default function TopicQuiz() {
                                     </Heading>
                                     <HStack className="items-center space-x-2">
                                         <Text className="text-typography-600 dark:text-typography-400 text-base">
-                                            {subjectName} Quiz
+                                            {subject} Quiz
                                         </Text>
                                         {quizState === "in-progress" &&
                                             quiz && (
@@ -231,7 +213,7 @@ export default function TopicQuiz() {
                         <VStack className="items-center space-y-4">
                             <Box
                                 className={`w-16 h-16 ${getSubjectColor(
-                                    subjectName
+                                    subject
                                 )} rounded-xl items-center justify-center`}>
                                 <Spinner
                                     size={"large"}

@@ -16,7 +16,7 @@ import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useState, useEffect, useCallback } from "react";
-import { Alert, RefreshControl, ScrollView } from "react-native";
+import { Alert, RefreshControl, ScrollView, useWindowDimensions } from "react-native";
 import React from "react";
 import { router } from "expo-router";
 import { Box } from "@/components/ui/box";
@@ -48,6 +48,8 @@ export default function Home() {
     const [isLoadingPlan, setIsLoadingPlan] = useState(false);
     const [studyStreak, setStudyStreak] = useState(0);
     const [refreshing, setRefreshing] = useState(false);
+    const { width } = useWindowDimensions();
+    const isSmol = width < 380;
 
     const handleNotesPress = (topic: string) => {
         router.push(`/notes/${selectedExam}/${encodeURIComponent(topic)}`);
@@ -150,7 +152,10 @@ export default function Home() {
     const renderSubjectSection = (subject: string, topics: string[]) => {
         return (
             <Box key={subject}>
-                <Text className="text-gray-500 dark:text-gray-300 text-lg font-semibold mb-2 text-center">
+                <Text
+                    className={`text-gray-500 dark:text-gray-300 ${
+                        isSmol ? "text-base" : "text-lg"
+                    } font-semibold mb-2 text-center`}>
                     {subject}
                 </Text>
                 <Box className="gap-2 mt-2">
@@ -169,10 +174,17 @@ export default function Home() {
                             <Box
                                 key={index}
                                 className="flex-row items-center justify-between">
-                                <Text className={`text-sm  dark:text-white`}>
-                                    {topic}
+                                <Text
+                                    numberOfLines={2}
+                                    ellipsizeMode="tail"
+                                    className={`${
+                                        isSmol ? "text-xs" : "text-sm"
+                                    } flex-1 pr-2 dark:text-white`}> {topic}
                                 </Text>
-                                <Box className="flex-row items-center gap-2">
+                                <Box
+                                    className={`flex-row items-center ${
+                                        isSmol ? "gap-1" : "gap-2"
+                                    }`}>
                                     <Button
                                         action={
                                             isQuizCompleted
@@ -180,8 +192,13 @@ export default function Home() {
                                                 : "negative"
                                         }
                                         variant={"solid"}
-                                        size={"sm"}
+                                        size={isSmol ? "xs" : "sm"}
                                         isDisabled={false}
+                                        style={
+                                            isSmol
+                                                ? { minWidth: 34, height: 34 }
+                                                : undefined
+                                        }
                                         onPress={() => {
                                             setStudyStreak(
                                                 topicsManager.getStudyStreak()
@@ -190,7 +207,7 @@ export default function Home() {
                                         }}>
                                         <ButtonIcon
                                             as={BadgeQuestionMark}
-                                            size={16}
+                                            size={isSmol ? 14 : 16}
                                             color="white"
                                         />
                                     </Button>
@@ -201,8 +218,13 @@ export default function Home() {
                                                 : "negative"
                                         }
                                         variant={"solid"}
-                                        size={"sm"}
+                                        size={isSmol ? "xs" : "sm"}
                                         isDisabled={false}
+                                        style={
+                                            isSmol
+                                                ? { minWidth: 34, height: 34 }
+                                                : undefined
+                                        }
                                         onPress={() => {
                                             topicsManager.markTopicCompleted(
                                                 subject,
@@ -216,7 +238,7 @@ export default function Home() {
                                         }}>
                                         <ButtonIcon
                                             as={ScrollText}
-                                            size={16}
+                                            size={isSmol ? 14 : 16}
                                             color="white"
                                         />
                                     </Button>
@@ -245,36 +267,46 @@ export default function Home() {
             refreshControl={
                 <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
             }>
-            <Box className="flex-1 p-4 mt-4">
-                <Box className="flex-row justify-center items-center gap-3">
+            <Box className={`flex-1 p-4 mt-4`}>
+                <Box
+                    className={`flex-row
+                    justify-center items-stretch gap-3 w-full`}>
                     <Card
-                        size={"lg"}
+                        size={isSmol ? "md" : "lg"}
                         variant={"filled"}
                         className={`${
                             selectedExam === Exam.JEE
                                 ? "bg-blue-600"
                                 : "bg-green-600"
-                        } w-64 border-2 dark:border-white`}>
-                        <Heading size="" className={"text-white mb-1"}>
+                        } flex-1 border-2 dark:border-white`}>
+                        <Heading
+                            size=""
+                            className={`text-white mb-1 ${
+                                isSmol ? "text-base" : ""
+                            }`}>
                             Exam in
                         </Heading>
                         <Text
-                            size="3xl"
+                            size={isSmol ? "2xl" : "3xl"}
                             className="text-white font-bold ml-auto">
                             {getDaysLeft(selectedExam) !== null
-                                ? `${getDaysLeft(selectedExam)} days`
+                                ? `${getDaysLeft(selectedExam)}`
                                 : "Invalid Date"}
                         </Text>
                     </Card>
                     <Card
-                        size={"lg"}
+                        size={isSmol ? "md" : "lg"}
                         variant={"filled"}
-                        className={`bg-yellow-500 dark:bg-yellow-500 border-2 dark:border-white`}>
-                        <Heading size="" className={"text-white mb-1"}>
+                        className="bg-yellow-500 dark:bg-yellow-500 flex-1 border-2 dark:border-white">
+                        <Heading
+                            size=""
+                            className={`text-white mb-1 ${
+                                isSmol ? "text-base" : ""
+                            }`}>
                             Current Streak
                         </Heading>
                         <Text
-                            size="3xl"
+                            size={isSmol ? "2xl" : "3xl"}
                             className="text-white font-bold ml-auto">
                             {studyStreak}
                         </Text>
