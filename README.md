@@ -1,6 +1,9 @@
 # PrepMate
 A simple,minimalistic app that you can use to prepare for your JEE/NEET exams
 
+#Download
+https://drive.google.com/file/d/1DgD2CpFet0q3nzMb4VGXzijV684zZHzx/view?usp=sharing
+
 ## ScreenShots
 
 ![Onboarding](https://hc-cdn.hel1.your-objectstorage.com/s/v3/256faed33d22400e5190c335957545557e746e31_image.png)
